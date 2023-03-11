@@ -1,0 +1,160 @@
+#include <Servo.h>
+
+Servo elevator;       // Servo 1
+Servo rudder;         // Servo 2
+Servo left_aileron;   // Servo 3
+Servo right_aileron;  // Servo 4
+Servo yaw;            // Servo 5
+Servo pitch;          // Servo 6
+Servo roll;           // Servo 7
+Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+Servo servo5;
+Servo servo6;
+Servo servo7;
+
+int pattern1[] = { 91, 90, 91, 89, 90, 115, 91, 140, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 40, 90, 65, 90, 91, 90, 91, 90, 91, 90, 91, 90 };
+int pattern2[] = { 95, 96, 95, 96, 95, 96, 95, 96, 95, 96, 95, 96, 95, 96, 95, 96, 95, 115, 95, 75, 95, 75, 95, 115, 95, 96, 95, 96, 95, 115, 95, 75, 95, 75, 95, 115, 95 };
+int pattern3[] = { 69, 70, 69, 71, 70, 21, 70, 45, 70, 120, 70, 21, 70, 21, 70, 120, 70, 121, 70, 21, 70, 21, 70, 120, 70, 121, 70, 95, 70, 71, 70, 71, 70, 71, 70, 71, 70 };
+int pattern4[] = { 91, 90, 91, 89, 90, 140, 91, 115, 91, 140, 91, 40, 91, 40, 91, 140, 91, 140, 91, 40, 91, 40, 91, 140, 91, 40, 91, 65, 90, 91, 90, 91, 90, 91, 90, 91, 90 };
+int pattern5[] = { 91, 90, 91, 89, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 50, 90, 130, 90, 131, 90, 50, 90, 91, 90, 91, 90, 50, 90, 130, 90, 131, 90, 50, 90 };
+int pattern6[] = { 91, 90, 91, 89, 90, 75, 91, 60, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 90, 91, 120, 91, 105, 91, 90, 91, 90, 91, 90, 91, 90, 91 };
+int pattern7[] = { 91, 90, 91, 89, 90, 91, 90, 89, 90, 50, 91, 130, 90, 129, 90, 50, 90, 91, 90, 89, 90, 91, 90, 89, 90, 91, 90, 89, 90, 91, 90, 89, 90, 91, 90, 89, 90 };
+
+int patternLength = sizeof(pattern1) / sizeof(int);
+int currentStep = 0;
+
+int joy1_x = A0;  // Joystick 1 x-axis input pin
+int joy1_y = A1;  // Joystick 1 y-axis input pin
+int joy2_x = A2;  // Joystick 2 x-axis input pin
+
+int buttonPin = 2;
+int buttonState = 0;
+
+int joy1_x_val;  // Joystick 1 x-axis value
+int joy1_y_val;  // Joystick 1 y-axis value
+int joy2_x_val;  // Joystick 2 x-axis value
+
+void setup() {
+  elevator.attach(2);       // Attach Servo 1 to pin 2
+  rudder.attach(4);         // Attach Servo 2 to pin 4
+  left_aileron.attach(5);   // Attach Servo 3 to pin 5
+  right_aileron.attach(6);  // Attach Servo 4 to pin 6
+  yaw.attach(7);            // Attach Servo 5 to pin 7
+  pitch.attach(8);          // Attach Servo 6 to pin 8
+  roll.attach(3);           // Attach Servo 7 to pin 3
+  servo1.attach(2);
+  servo2.attach(4);
+  servo3.attach(5);
+  servo4.attach(6);
+  servo5.attach(7);
+  servo6.attach(8);
+  servo7.attach(3);
+
+  pinMode(buttonPin, INPUT);
+  Serial.begin(9600);  // Initialize serial communication
+}
+
+void loop() {
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {
+    autopilotSequence();
+  } else {
+    manualOverride();
+  }
+}
+
+void autopilotSequence() {
+ int pos1 = pattern1[currentStep];
+  int pos2 = pattern2[currentStep];
+  int pos3 = pattern3[currentStep];
+  int pos4 = pattern4[currentStep];
+  int pos5 = pattern5[currentStep];
+  int pos6 = pattern6[currentStep];
+  int pos7 = pattern7[currentStep];
+
+  int currentPos1 = servo1.read();
+  int currentPos2 = servo2.read();
+  int currentPos3 = servo3.read();
+  int currentPos4 = servo4.read();
+  int currentPos5 = servo5.read();
+  int currentPos6 = servo6.read();
+  int currentPos7 = servo7.read();
+
+  for (int i = 0; i <= 10; i++) {
+    int targetPos1 = currentPos1 + ((pos1 - currentPos1) * i / 10);
+    int targetPos2 = currentPos2 + ((pos2 - currentPos2) * i / 10);
+    int targetPos3 = currentPos3 + ((pos3 - currentPos3) * i / 10);
+    int targetPos4 = currentPos4 + ((pos4 - currentPos4) * i / 10);
+    int targetPos5 = currentPos5 + ((pos5 - currentPos5) * i / 10);
+    int targetPos6 = currentPos6 + ((pos6 - currentPos6) * i / 10);
+    int targetPos7 = currentPos7 + ((pos7 - currentPos7) * i / 10);
+
+    servo1.write(targetPos1);
+    servo2.write(targetPos2);
+    servo3.write(targetPos3);
+    servo4.write(targetPos4);
+    servo5.write(targetPos5);
+    servo6.write(targetPos6);
+    servo7.write(targetPos7);
+
+    delay(100);  // adjust this delay time as needed for smoother movement
+    
+  }
+
+  currentStep = (currentStep + 1) % patternLength;
+}
+
+void manualOverride() {
+
+  joy1_x_val = analogRead(joy1_x);  // Read Joystick 1 x-axis value
+  joy1_y_val = analogRead(joy1_y);  // Read Joystick 1 y-axis value
+  joy2_x_val = analogRead(joy2_x);  // Read Joystick 2 x-axis value
+
+  // When Joystick 1 moves y-axis
+  if (joy1_y_val > 600) {
+    elevator.write(180);       // Activate Servo 1
+    pitch.write(180);          // Activate Servo 6
+    left_aileron.write(180);   // Activate Servo 3
+    right_aileron.write(180);  // Activate Servo 4
+  } else if (joy1_y_val < 400) {
+    elevator.write(0);       // Activate Servo 1
+    pitch.write(0);          // Activate Servo 6
+    left_aileron.write(0);   // Activate Servo 3
+    right_aileron.write(0);  // Activate Servo 4
+  } else {
+    elevator.write(90);       // Return Servo 1 to 90 degrees
+    pitch.write(90);          // Return Servo 6 to 90 degrees
+    left_aileron.write(90);   // Return Servo 3 to 90 degrees
+    right_aileron.write(90);  // Return Servo 4 to 90 degrees
+  }
+
+  // When Joystick 1 moves x-axis
+  if (joy1_x_val > 600) {
+    left_aileron.write(180);   // Activate Servo 3
+    right_aileron.write(180);  // Activate Servo 4
+    roll.write(180);           // Activate Servo 7
+  } else if (joy1_x_val < 400) {
+    left_aileron.write(0);   // Activate Servo 3
+    right_aileron.write(0);  // Activate Servo 4
+    roll.write(0);           // Activate Servo 7
+  } else {
+    roll.write(90);           // Return Servo 7 to 90 degrees
+  }
+
+  // When Joystick 2 moves x-axis
+  if (joy2_x_val > 600) {
+    yaw.write(180);     // Activate Servo 5
+    rudder.write(180);  // Activate Servo 2
+  } else if (joy2_x_val < 400) {
+    yaw.write(0);     // Activate Servo 5
+    rudder.write(0);  // Activate Servo 2
+  } else {
+    yaw.write(90);     // Return Servo 5 to 90 degrees
+    rudder.write(90);  // Return Servo 2 to 90 degrees
+  }
+
+  delay(20);  // Add a short delay
+}
